@@ -1,84 +1,85 @@
 <template>
   <div>
-    <el-table :data="tableData1" ref="table1">
-      <el-table-column prop="name" label="姓名"></el-table-column>
-      <el-table-column prop="age" label="年龄"></el-table-column>
-      <el-table-column prop="email" label="邮箱"></el-table-column>
-    </el-table>
-
-    <button @click="downloadExcel(tableData1)">下载 Excel 文件1</button>
-
-    <el-table :data="tableData2" ref="table2">
-      <el-table-column prop="name" label="姓名"></el-table-column>
-      <el-table-column prop="age" label="年龄"></el-table-column>
-      <el-table-column prop="email" label="邮箱"></el-table-column>
-    </el-table>
-
-    <button @click="downloadExcel(tableData2)">下载 Excel 文件2</button>
-
-    <el-table :data="tableData3" ref="table3">
-      <el-table-column prop="name" label="姓名"></el-table-column>
-      <el-table-column prop="age" label="年龄"></el-table-column>
-      <el-table-column prop="email" label="邮箱"></el-table-column>
-    </el-table>
-
-    <button @click="downloadExcel(tableData3)">下载 Excel 文件3</button>
+    <el-form ref="form" :model="form" label-width="100px">
+      <el-form-item v-for="(item, index) in formItems" :key="index" :label="item.label">
+        <el-input v-if="item.type === 'input'" v-model="form[item.key]" />
+        <el-select v-else-if="item.type === 'select'" v-model="form[item.key]">
+          <el-option v-for="(option, i) in item.options" :key="i" :label="option.label" :value="option.value" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="submitForm">提交</el-button>
+        <el-button @click="resetForm">重置</el-button>
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { ref } from 'vue';
-import * as XLSX from 'xlsx';
+<script lang="ts">
+import { defineComponent, reactive } from 'vue'
+import { ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElButton } from 'element-plus'
 
-const tableData1 = [...];
-const tableData2 = [...];
-const tableData3 = [...];
+export default defineComponent({
+  name: 'FormDemo',
+  components: {
+    ElForm,
+    ElFormItem,
+    ElInput,
+    ElSelect,
+    ElOption,
+    ElButton
+  },
+  setup() {
+    const form = reactive({
+      name: '',
+      gender: '',
+      age: ''
+    })
 
-const tableRef1 = ref<HTMLElement | null>(null);
-const tableRef2 = ref<HTMLElement | null>(null);
-const tableRef3 = ref<HTMLElement | null>(null);
+    const formItems = [
+      {
+        label: '姓名',
+        key: 'name',
+        type: 'input'
+      },
+      {
+        label: '性别',
+        key: 'gender',
+        type: 'select',
+        options: [
+          {
+            label: '男',
+            value: 'male'
+          },
+          {
+            label: '女',
+            value: 'female'
+          }
+        ]
+      },
+      {
+        label: '年龄',
+        key: 'age',
+        type: 'input'
+      }
+    ]
 
-const downloadExcel = (tableData: any[]) => {
-  let tableRef: any;
+    function submitForm() {
+      console.log(form)
+    }
 
-  if (tableData === tableData1) {
-    tableRef = tableRef1;
-  } else if (tableData === tableData2) {
-    tableRef = tableRef2;
-  } else if (tableData === tableData3) {
-    tableRef = tableRef3;
+    function resetForm() {
+      Object.keys(form).forEach(key => {
+        form[key] = ''
+      })
+    }
+
+    return {
+      form,
+      formItems,
+      submitForm,
+      resetForm
+    }
   }
-
-  const table = tableRef.value?.querySelector('.el-table__body');
-
-  if (table) {
-    // 从表格中获取数据
-    const data = [];
-    const rows = table.querySelectorAll('.el-table__row');
-    rows.forEach((row) => {
-      const rowData = [];
-      const cells = row.querySelectorAll('.el-table__cell');
-      cells.forEach((cell) => {
-        rowData.push(cell.textContent);
-      });
-      data.push(rowData);
-    });
-
-    // 将数据转换为 Excel 文件
-    const workbook = XLSX.utils.book_new();
-    const sheet = XLSX.utils.aoa_to_sheet(data);
-    XLSX.utils.book_append_sheet(workbook, sheet, 'Sheet1');
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const fileName = 'table.xlsx';
-
-    // 下载文件
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-};
-</
+})
+</script>
