@@ -1,85 +1,40 @@
-<template>
-  <div>
-    <el-form ref="form" :model="form" label-width="100px">
-      <el-form-item v-for="(item, index) in formItems" :key="index" :label="item.label">
-        <el-input v-if="item.type === 'input'" v-model="form[item.key]" />
-        <el-select v-else-if="item.type === 'select'" v-model="form[item.key]">
-          <el-option v-for="(option, i) in item.options" :key="i" :label="option.label" :value="option.value" />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="submitForm">提交</el-button>
-        <el-button @click="resetForm">重置</el-button>
-      </el-form-item>
-    </el-form>
+<el-upload
+  class="upload"
+  action="/api/upload"
+  :show-file-list="false"
+  :on-success="onSuccess"
+  :before-upload="beforeUpload"
+>
+  <el-button slot="trigger" type="primary">选取文件</el-button>
+  <div slot="tip" class="upload-tip">只能上传jpg/png文件，且不超过500kb</div>
+  <div class="upload-list" slot-scope="{ fileList }">
+    <el-upload-list :list-type="'picture-card'">
+      <div v-for="(file, index) in fileList" :key="index" class="upload-item">
+        <img :src="file.url" alt="" class="upload-img">
+      </div>
+    </el-upload-list>
   </div>
-</template>
+</el-upload>
 
-<script lang="ts">
-import { defineComponent, reactive } from 'vue'
-import { ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElButton } from 'element-plus'
+<style>
+.upload-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  width: 300px; /* 自定义宽度 */
+}
 
-export default defineComponent({
-  name: 'FormDemo',
-  components: {
-    ElForm,
-    ElFormItem,
-    ElInput,
-    ElSelect,
-    ElOption,
-    ElButton
-  },
-  setup() {
-    const form = reactive({
-      name: '',
-      gender: '',
-      age: ''
-    })
+.upload-item {
+  width: 80px; /* 自定义宽度 */
+  height: 80px; /* 自定义高度 */
+  margin-right: 10px;
+  margin-bottom: 10px;
+  position: relative;
+}
 
-    const formItems = [
-      {
-        label: '姓名',
-        key: 'name',
-        type: 'input'
-      },
-      {
-        label: '性别',
-        key: 'gender',
-        type: 'select',
-        options: [
-          {
-            label: '男',
-            value: 'male'
-          },
-          {
-            label: '女',
-            value: 'female'
-          }
-        ]
-      },
-      {
-        label: '年龄',
-        key: 'age',
-        type: 'input'
-      }
-    ]
-
-    function submitForm() {
-      console.log(form)
-    }
-
-    function resetForm() {
-      Object.keys(form).forEach(key => {
-        form[key] = ''
-      })
-    }
-
-    return {
-      form,
-      formItems,
-      submitForm,
-      resetForm
-    }
-  }
-})
-</script>
+.upload-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+</style>
