@@ -1,40 +1,89 @@
-<el-upload
-  class="upload"
-  action="/api/upload"
-  :show-file-list="false"
-  :on-success="onSuccess"
-  :before-upload="beforeUpload"
->
-  <el-button slot="trigger" type="primary">选取文件</el-button>
-  <div slot="tip" class="upload-tip">只能上传jpg/png文件，且不超过500kb</div>
-  <div class="upload-list" slot-scope="{ fileList }">
-    <el-upload-list :list-type="'picture-card'">
-      <div v-for="(file, index) in fileList" :key="index" class="upload-item">
-        <img :src="file.url" alt="" class="upload-img">
-      </div>
-    </el-upload-list>
-  </div>
-</el-upload>
+import { service } from '@/utils/request.ts'
 
-<style>
-.upload-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  width: 300px; /* 自定义宽度 */
+// 获取表格数据
+export const getData = () => {
+return service({
+    url: '/DataCenter/getDataCenter',
+    method: 'get',
+})
 }
 
-.upload-item {
-  width: 80px; /* 自定义宽度 */
-  height: 80px; /* 自定义高度 */
-  margin-right: 10px;
-  margin-bottom: 10px;
-  position: relative;
+// 获取表格数据
+export const getSearchData = (table:string,name:string) => {
+    return service({
+        url: '/DataCenter/getSearchData',
+        method: 'get',
+        params:{
+            type:table,
+            site:'',
+            searchName:name
+        }
+    })
 }
 
-.upload-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+// 批量上传
+export const uploadData = (table:string,upload: any) => {
+   
+    return service({
+        url: '/DataCenter/postUploadData',
+        method: 'post',
+        data:table,upload
+    })
 }
-</style>
+
+// 更新数据
+export const updateData = (table:string, editData:any) => {
+    // editData.add('type',table)
+    editData.type=table
+    return service({
+        url: '/DataCenter/putUpdateData',
+        method: 'put',
+        params:editData,
+    })
+    }
+
+
+// 添加数据
+export const addData = (table:string,addData: any) => {
+    addData.type=table
+return service({
+    url: '/DataCenter/postNewData',
+    method: 'post',
+    params:addData
+})
+}
+
+// 附件上传
+export const addFile = (table:string,fileName:string) => {
+    return service({
+        url: '/DataCenter/postUploadFile',
+        method: 'post',
+        data:table,fileName
+    })
+    }
+
+
+
+// 删除文件
+export const deleteFile = (fileName: string) => {
+    return service({
+        url: '/DataCenter/deleteFile',
+        method: 'put',
+        data: fileName,
+    })
+}
+
+
+// 删除数据
+export const deleteData = (table:string ,dataName: string) => {
+
+    return service({
+        url: '/DataCenter/deleteData',
+        method: 'put',
+        params: {
+            type:table,
+            site:'',
+            fileNumber:dataName,
+        }
+    })
+}
