@@ -1,7 +1,7 @@
 
 <template>
   <div class="container">
-
+    <!-- interval为选项栏 -->
     <div class="interval">
       <el-row style="height:20px"></el-row>
       <el-row class="second_row" :gutter="24" style="height:30px">
@@ -50,7 +50,7 @@
 
       </el-row>
     </div>
-
+    <!-- 第一个表 -->
     <div class="onePicture">
 
       <el-table ref="table1" :row-style="{ height: 30 }" height="100" :data="certificateList"
@@ -150,7 +150,7 @@
 
       </el-row>
     </div>
-
+  <!-- 第二个表 -->
     <div class="twoPicture">
       <el-table ref="table2" :row-style="{ height: 30 }" height="250" :data="criterionList"
         :row-class-name="tableRowClassName" :header-cell-style="{ textAlign: 'center' }"
@@ -271,7 +271,7 @@
 
       </el-row>
     </div>
-
+  <!-- 第三个表 -->
     <div class="threePicture">
 
       <el-table ref="table3" :row-style="{ height: 30 }" height="170" :data="documentList"
@@ -464,14 +464,14 @@
 
 <!-- <script setup lang="ts"> -->
 <script lang="ts" setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted,getCurrentInstance } from 'vue'
 import { Plus, Search, Filter, UploadFilled, Download, Edit, Delete, SetUp, Document } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, ElUpload } from 'element-plus';
 import * as XLSX from '../../../node_modules/xlsx';
 import axios from 'axios'
 import { getData, addData, updateData, deleteData, getSearchData, uploadData, addFile, deleteFile } from '../../api/dataCenter'
 import { objectPick } from '@vueuse/shared';
-import { id } from 'element-plus/es/locale';
+
 // import {saveAs} from '../../../node_modules/file-saver';
 import { saveAs } from 'file-saver';
 
@@ -479,92 +479,87 @@ import { saveAs } from 'file-saver';
 import type { UploadProps, UploadUserFile } from 'element-plus'
 
 
+// const {
+//   appContext: {
+//     config: { globalProperties },
+//   },
+// } = getCurrentInstance()
+
+// console.log(globalProperties.$t('authority.signup'))
 
 
 
-const fileList = ref<UploadUserFile[]>([
-  {
-    name: '',
-    url: 'https://element-plus.org/images/element-plus-logo.svg',
-  },
-  {
-    name: '',
-    url: 'https://element-plus.org/images/element-plus-logo.svg',
-  },
-  {
-    name: '',
-    url: 'https://element-plus.org/images/element-plus-logo.svg',
-  },
-])
-
-
-const certificateFileList = ref<UploadUserFile[]>([
-  {
-    name: '',
-    url: 'https://element-plus.org/images/element-plus-logo.svg',
-  },
-  {
-    name: '',
-    url: 'https://element-plus.org/images/element-plus-logo.svg',
-  },
-  {
-    name: '',
-    url: 'https://element-plus.org/images/element-plus-logo.svg',
-  },
-])
-
-const criterionFileList = ref<UploadUserFile[]>([
-  {
-    name: '',
-    url: 'https://element-plus.org/images/element-plus-logo.svg',
-  },
-  {
-    name: '',
-    url: 'https://element-plus.org/images/element-plus-logo.svg',
-  },
-  {
-    name: '',
-    url: 'https://element-plus.org/images/element-plus-logo.svg',
-  },
-])
-
-const documentFileList = ref<UploadUserFile[]>([
-  {
-    name: '',
-    url: 'https://element-plus.org/images/element-plus-logo.svg',
-  },
-  {
-    name: '',
-    url: 'https://element-plus.org/images/element-plus-logo.svg',
-  },
-  {
-    name: '',
-    url: 'https://element-plus.org/images/element-plus-logo.svg',
-  },
-])
 
 
 
-// 删除文件
+
+// const certificateFileList = ref<UploadUserFile[]>([
+
+//   {
+//     name: '',
+//     url: 'https://element-plus.org/images/element-plus-logo.svg',
+//   },
+//   {
+//     name: '',
+//     url: 'https://element-plus.org/images/element-plus-logo.svg',
+//   },
+//   {
+//     name: '',
+//     url: 'https://element-plus.org/images/element-plus-logo.svg',
+//   },
+// ])
+
+// const criterionFileList = ref<UploadUserFile[]>([
+//   {
+//     name: '',
+//     url: 'https://element-plus.org/images/element-plus-logo.svg',
+//   },
+//   {
+//     name: '',
+//     url: 'https://element-plus.org/images/element-plus-logo.svg',
+//   },
+//   {
+//     name: '',
+//     url: 'https://element-plus.org/images/element-plus-logo.svg',
+//   },
+// ])
+
+// const documentFileList = ref<UploadUserFile[]>([
+//   {
+//     name: '',
+//     url: 'https://element-plus.org/images/element-plus-logo.svg',
+//   },
+//   {
+//     name: '',
+//     url: 'https://element-plus.org/images/element-plus-logo.svg',
+//   },
+//   {
+//     name: '',
+//     url: 'https://element-plus.org/images/element-plus-logo.svg',
+//   },
+// ])
+
+
+
+
+
+
+// 删除附件
 const handleRemove: UploadProps['onRemove'] = (file, uploadFiles) => {
   console.log("uploadFiles", uploadFiles)
   // 传给后端，要删除的文件。
   console.log("file", file) //删除的文件
-
-
   // deleteFile(file)
-
-
 }
 
-// 浏览文件
+// 浏览附件
 const handlePreview: UploadProps['onPreview'] = (uploadFile) => {
   // console.log(uploadFile.url)
   window.open(uploadFile.url)
   // 点击文件查看
 }
 
-// 文件个数限制
+// 附件个数限制
 const handleExceed: UploadProps['onExceed'] = (files, uploadFiles) => {
   ElMessage.warning(
     `The limit is 3, you selected ${files.length} files this time, add up to ${files.length + uploadFiles.length
@@ -586,26 +581,28 @@ const handleExceed: UploadProps['onExceed'] = (files, uploadFiles) => {
 
 
 // ==========
-
+// 附件地址
 const attachmentUploadAddress = () => {
   return 'http://10.213.129.26:8000/api/DataCenter/'
 }
-
+// 批量上传地址
 const batchUploadDataAddress = () => {
   return 'http://10.213.129.26:8000/api/DataCenter/'
 }
 
 
-
+// 文件当前页和每页的数量
 const currentDocumentPage = ref(3)
 const pageDocumentSize = ref(2)
 
+// 标准当前页和每页的数量
 const currentCriterionPage = ref(3)
 const pageCriterionSize = ref(2)
 
 // type Query = Record<string, any>;
 // type Form = Record<string, any>;
 
+// 证书，标准，文件信息
 var queryCertificateInfo = ref<any>(
   {
     query: '',
@@ -628,7 +625,7 @@ var queryDocumentInfo = ref<any>(
   }
 )
 
-
+// 自定义证书，标准，文件类型
 interface Certificate {
 
   site: string
@@ -663,6 +660,7 @@ interface Document {
 
 // var certificateList: Certificate[] = []
 
+// 用于存储表格的显示列表
 const certificateList = ref<Certificate[]>([])
 const criterionList = ref<Criterion[]>([])
 const documentList = ref<Document[]>([])
@@ -723,7 +721,6 @@ var editCriterionForm = ref<any>({
   username: ''
 })
 
-
 // 添加文件的表单数据
 var addDocumentForm = ref<any>(
   {
@@ -761,7 +758,10 @@ var editDocumentDialogVisible = ref(false);
 // 删除弹窗
 const dialogVisible = ref(false)
 
-// 监听pagesize改变的事件
+
+// console.log( 'tttttttttttttttttttttt',$t('authority.approve'))
+
+// 监听pagesize改变的事件，奇数行和偶数行的样式class
 const tableRowClassName = ({
   rowIndex
 }: {
@@ -776,7 +776,7 @@ const tableRowClassName = ({
   return ''
 }
 
-
+// 证书表单项
 const certificateFormItems = [
   { label: 'Site', prop: 'site' },
   { label: '文件編號', prop: 'filenumber' },
@@ -787,7 +787,7 @@ const certificateFormItems = [
   { label: '狀態', prop: 'status' },
   { label: '上傳人', prop: 'username' },
 ]
-
+// 标准表单项
 const criterionFormItems = [
   { label: 'Site', prop: 'site' },
   { label: '文件編號', prop: 'filenumber' },
@@ -798,17 +798,16 @@ const criterionFormItems = [
   { label: '狀態', prop: 'status' },
   { label: '上傳人', prop: 'username' },
 ]
+// 文件表单项
 const documentFormItems = [
   { label: 'Site', prop: 'site' },
   { label: '文件編號', prop: 'filenumber' },
   { label: '文件名稱', prop: 'filename' },
-
 ]
 
 let tableData1: Certificate[] = []
 let tableData2: Criterion[] = []
 let tableData3: Document[] = []
-
 
 const total2 = ref(0)
 const total3 = ref(0)
@@ -842,8 +841,7 @@ function handleDocumentCurrentChange(newPage: number) {
   getDocumentList()
 }
 
-
-
+// 初始表格数据
 function getAllData() {
   getData().then((res: any) => {
 
@@ -865,7 +863,7 @@ function getAllData() {
   })
 }
 
-
+// 搜索数据
 function searchData(table: string) {
 
   let queryText = ''
@@ -880,8 +878,10 @@ function searchData(table: string) {
     console.log("错误")
   }
 
+  // 连接后端
   getSearchData(table, queryText).then((res: any) => {
 
+    console.log("res.data",res.data)
     let data: any[] = res.data
 
     console.log("data", data)
@@ -1307,7 +1307,7 @@ function removeAllTypeById(table: string, fileName: string) {
 // const tableRef2 = ref<HTMLElement | null>(null);
 // const tableRef3 = ref<HTMLElement | null>(null);
 
-// 下载
+// 下载表格数据
 const downloadExcel = (table: string) => {
 
   let tableData: any = []
@@ -1322,7 +1322,6 @@ const downloadExcel = (table: string) => {
     documentName = 'table2.xlsx'
   } else if (table === 'tableData3') {
     tableData = tableData3;
-
     documentName = 'table3.xlsx'
   }
 
