@@ -12,7 +12,6 @@
               <el-icon>
                 <Filter />
               </el-icon>
-
             </template>
             <template #append>
               <!-- <el-button :icon="Search" /> -->
@@ -25,9 +24,9 @@
           </el-input>
         </el-col>
         <el-col :span="1.5" style="padding-top: 6px; padding-right: 0; padding-left: 5px;">
-          <el-upload :action="batchUploadDataAddress" :show-file-list="false">
+          <el-upload :data={type:certificate} action="#" :show-file-list="false" :before-upload="batchBeforeUploade('certificate')" >
             <img src="./icons/上傳.png" class="upload_icon" style="width:16px;height: 12px;" />
-            <el-button style="height: 25px;  color: white; background: transparent; border: none;">
+            <el-button style="height: 25px;  color: white; background: transparent; border: none;" >
               Upload
             </el-button>
           </el-upload>
@@ -47,55 +46,37 @@
               <Plus />
             </el-icon>New</el-button>
         </el-col>
-
       </el-row>
     </div>
     <!-- 第一个表 -->
     <div class="onePicture">
-
       <el-table ref="table1" :row-style="{ height: 30 }" height="100" :data="certificateList"
         :row-class-name="tableRowClassName" :header-cell-style="{ textAlign: 'center' }"
-        :cell-style="{ textAlign: 'center' }">
+        :cell-style="{ textAlign: 'center' }" >
         <el-table-column label="No." type="index" width="50px"></el-table-column>
-        <el-table-column label="Site" prop="site" width="75px"></el-table-column>
-        <el-table-column label="證書編號" prop="filenumber" width="150px"></el-table-column>
-        <el-table-column label="證書標準" prop="filename" width="200px"></el-table-column>
-        <el-table-column label="證書附件" prop="attachment" width="100px">
 
-          <template #default="scope">
-            <el-upload v-model:file-list="scope.row.attachment" class="upload-demo" :action="attachmentUploadAddress"
-              multiple :on-preview="handlePreview" :on-remove="handleRemove" :limit="3" :on-exceed="handleExceed">
+        <el-table-column v-for="(item, index) in certificateForm" :key="index" :label="item.label" :prop="item.prop" :width="item.width">
+          <template v-if="item.prop ==='attachment' " #default="scope">
+            <el-upload :before-remove="attachmentBeforeRemove(scope.row,certificate)" :before-upload="certificateBeforeUpload(scope.row)" v-model:file-list="scope.row.attachment" class="upload-demo" action="#"
+              multiple  :on-preview="handlePreview" :on-remove="handleRemove" :limit="3"  >
               <el-button>
                 <img src="./icons/文件.png" class="export_icon" style="width:12px;height: 12px;" />
               </el-button>
             </el-upload>
           </template>
-        </el-table-column>
-
-
-        <el-table-column label="發證日期" prop="issuedate" width="150px"></el-table-column>
-        <el-table-column label="失效日期" prop="expiringdate" width="150px"></el-table-column>
-        <el-table-column label="狀態" prop="status" width="75px"></el-table-column>
-        <el-table-column label="上傳人" prop="username" width="100px"></el-table-column>
-        <el-table-column label="編輯" prop="edit" width="75px">
-          <template #default="scope">
+          <template v-else-if="item.prop==='edit'" #default="scope">
             <el-button :icon="Edit" size="small" @click="showAllTypeEditDialog('certificate', scope.row)"></el-button>
           </template>
-        </el-table-column>
-
-        <el-table-column label="刪除" width="75px">
-          <template #default="scope">
+          <template v-else-if="item.prop==='delete'" #default="scope">
             <el-button size="small" type="danger" class="delete_button"
               @click="removeAllTypeById('certificate', scope.row.filenumber)">
               <img src="./icons/刪除-未選中.png" class="export_icon" style="width:12px;height: 12px;" />
             </el-button>
-          </template>
+          </template>       
         </el-table-column>
       </el-table>
 
-
     </div>
-
     <div class="interval">
       <el-row style="height:20px"></el-row>
       <el-row class="second_row" :gutter="24" style="height:30px">
@@ -106,7 +87,6 @@
               <el-icon>
                 <Filter />
               </el-icon>
-
             </template>
             <template #append>
               <!-- <el-button :icon="Search" /> -->
@@ -119,19 +99,12 @@
           </el-input>
         </el-col>
         <el-col :span="1.5" style="padding-top: 6px; padding-right: 0; padding-left: 5px;">
-          <!-- <img src="./icons/上傳.png" class="upload_icon" style="width:16px;height: 12px;" /> -->
-          <!-- <el-icon><UploadFilled /></el-icon>  -->
-        <!-- <el-button @click="editCriterionDialogVisible = true"
-            style="height: 25px;  color: white; background: transparent; border: none;">
-                Upload</el-button> -->
-
-          <el-upload :action="batchUploadDataAddress" :show-file-list="false">
+          <el-upload :data={type:criterion} action="#" :show-file-list="false" :before-upload="batchBeforeUploade('criterion')">
             <img src="./icons/上傳.png" class="upload_icon" style="width:16px;height: 12px;" />
             <el-button style="height: 25px;  color: white; background: transparent; border: none;">
               Upload
             </el-button>
           </el-upload>
-
         </el-col>
         <el-col :span="1.5" style="padding-top: 6px; padding-right: 0; padding-left: 10px;">
           <img src="./icons/下載-63.png" class="export_icon" style="width:16px;height: 12px;" />
@@ -147,7 +120,6 @@
               <Plus />
             </el-icon>New</el-button>
         </el-col>
-
       </el-row>
     </div>
   <!-- 第二个表 -->
@@ -155,56 +127,29 @@
       <el-table ref="table2" :row-style="{ height: 30 }" height="250" :data="criterionList"
         :row-class-name="tableRowClassName" :header-cell-style="{ textAlign: 'center' }"
         :cell-style="{ textAlign: 'center' }">
-
-
-        <el-table-column label="No." type="index" width="50px">
-
-        </el-table-column>
-        <el-table-column label="Site" prop="site" width="75px">
-
-        </el-table-column>
-        <el-table-column label="文件編號" prop="filenumber" width="150px">
-
-        </el-table-column>
-        <el-table-column label="文件名稱" prop="filename" width="200px">
-
-        </el-table-column>
-        <el-table-column label="版本" prop="ver" width="100px">
-
-        </el-table-column>
-        <el-table-column label="發證日期" prop="issuedate" width="150px">
-
-        </el-table-column>
-
-
-
-        <el-table-column label="附件" prop="attachment" width="150px">
-          <template #default="scope">
-            <el-upload v-model:file-list="scope.row.attachment" class="upload-demo" :action="attachmentUploadAddress"
-              multiple :on-preview="handlePreview" :on-remove="handleRemove" :limit="3" :on-exceed="handleExceed">
+        <el-table-column label="No." type="index" width="50px"></el-table-column>
+        
+        <el-table-column v-for="(item, index) in criterionForm" :key="index" :label="item.label" :prop="item.prop" :width="item.width">
+          <template v-if="item.prop ==='attachment'"  #default="scope">
+            <el-upload :before-remove="attachmentBeforeRemove(scope.row,certificate)" :before-upload="criterionBeforeUpload(scope.row)" :data={filenumber:scope.row.filenumber,type:criterion} v-model:file-list="scope.row.attachment" class="upload-demo" action="#"
+              multiple :on-preview="handlePreview" :on-remove="handleRemove" :limit="3" >
               <el-button>
                 <img src="./icons/文件.png" class="export_icon" style="width:12px;height: 12px;" />
               </el-button>
             </el-upload>
           </template>
-        </el-table-column>
-
-        <el-table-column label="狀態" prop="status" width="75px"></el-table-column>
-        <el-table-column label="上傳人" prop="username" width="100px"></el-table-column>
-        <el-table-column label="編輯" prop="edit" width="75px">
-          <template #default="scope">
+          <template v-else-if="item.prop ==='edit' " #default="scope">
             <el-button :icon="Edit" size="small" @click="showAllTypeEditDialog('criterion', scope.row)"></el-button>
           </template>
-        </el-table-column>
 
-        <el-table-column label="刪除" width="75px">
-          <template #default="scope">
+          <template v-else-if="item.prop ==='delete' " #default="scope">
             <el-button size="small" type="danger" class="delete_button"
               @click="removeAllTypeById('criterion', scope.row.filenumber)">
               <img src="./icons/刪除-未選中.png" class="export_icon" style="width:12px;height: 12px;" />
             </el-button>
           </template>
         </el-table-column>
+
 
       </el-table>
 
@@ -239,14 +184,7 @@
           </el-input>
         </el-col>
         <el-col :span="1.5" style="padding-top: 6px; padding-right: 0; padding-left: 5px;">
-          <!-- <img src="./icons/上傳.png" class="upload_icon" style="width:16px;height: 12px;" /> -->
-          <!-- <el-icon><UploadFilled /></el-icon>  -->
-        <!-- <el-button @click="editDocumentDialogVisible = true"
-            style="height: 25px;  color: white; background: transparent; border: none;">
-                Upload</el-button> -->
-
-
-          <el-upload :action="batchUploadDataAddress" :show-file-list="false">
+          <el-upload :data={type:document} action="#" :show-file-list="false" :before-upload="batchBeforeUploade('document')">
             <img src="./icons/上傳.png" class="upload_icon" style="width:16px;height: 12px;" />
             <el-button style="height: 25px;  color: white; background: transparent; border: none;">
               Upload
@@ -279,43 +217,31 @@
         :cell-style="{ textAlign: 'center' }">
 
         <el-table-column label="No." type="index" width="200px"></el-table-column>
-        <el-table-column label="Site" prop="site" width="200"></el-table-column>
-        <el-table-column label="文件編號" prop="filenumber" width="240"></el-table-column>
-        <el-table-column label="文件名稱" prop="filename" width="240"></el-table-column>
-        <el-table-column label="附件" prop="annex" width="200">
-          <template #default="scope">
-            <el-upload v-model:file-list="scope.row.attachment" class="upload-demo" :action="attachmentUploadAddress"
-              multiple :on-preview="handlePreview" :on-remove="handleRemove" :limit="3" :on-exceed="handleExceed">
+
+        <el-table-column v-for="(item, index) in documentForm" :key="index" :label="item.label" :prop="item.prop" :width="item.width">
+          <template v-if="item.prop ==='attachment'" #default="scope">
+            <el-upload :before-remove="attachmentBeforeRemove(scope.row,certificate)" :before-upload="documentBeforeUpload(scope.row)"  v-model:file-list="scope.row.attachment" class="upload-demo" action="#"
+              multiple :on-preview="handlePreview" :on-remove="handleRemove" :limit="3" >
               <el-button>
                 <img src="./icons/文件.png" class="export_icon" style="width:12px;height: 12px;" />
               </el-button>
             </el-upload>
           </template>
-
-
-          <!-- action上传文件地址 -->
-        </el-table-column>
-
-        <el-table-column label="編輯" prop="edit" width="60px">
-          <template #default="scope">
+        
+          <template v-else-if="item.prop ==='edit'" #default="scope">
             <el-button :icon="Edit" size="small" @click="showAllTypeEditDialog('document', scope.row)"></el-button>
           </template>
-        </el-table-column>
 
-        <el-table-column label="刪除" width="60px">
-          <template #default="scope">
+          <template v-else-if="item.prop ==='delete'" #default="scope">
             <el-button size="small" type="danger" class="delete_button"
               @click="removeAllTypeById('document', scope.row.filenumber)">
               <img src="./icons/刪除-未選中.png" class="export_icon" style="width:12px;height: 12px;" />
             </el-button>
           </template>
         </el-table-column>
-
       </el-table>
 
       <div class="page_row">
-
-
         <el-pagination v-model:current-page="currentDocumentPage" v-model:page-size="pageDocumentSize"
           :page-sizes="[1, 2, 5]" layout="->, total,  prev, pager, next, sizes, jumper" :total="total3"
           @size-change="handleDocumentSizeChange" @current-change="handleDocumentCurrentChange"
@@ -326,9 +252,6 @@
 
   </div>
 
-
-
-
   <!-- 添加证书对话框 -->
   <el-dialog v-model="addCertificateDialogVisible" :visible.sync="addCertificateDialogVisible" title="添加" width="30%">
     <!-- 内容主体区域 -->
@@ -337,7 +260,6 @@
       <el-form-item v-for="(item, index) in certificateFormItems" :key="index" :label="item.label" :prop="item.prop">
         <el-input v-model="addCertificateForm[item.prop]"></el-input>
       </el-form-item>
-
 
     </el-form>
 
@@ -352,15 +274,13 @@
   </el-dialog>
 
   <!--编辑证书对话框-->
-  <el-dialog title="修改用户" v-model="editCertificateDialogVisible" :visible.sync="editCertificateDialogVisible" width="50%"
-    @close="editDialogClosed">
+  <el-dialog title="修改用户" v-model="editCertificateDialogVisible" :visible.sync="editCertificateDialogVisible" width="50%">
     <el-form :model="editCertificateForm" ref="editFormRef" label-width="100px" label-position="top">
 
-
       <el-form-item v-for="(item, index) in certificateFormItems" :key="index" :label="item.label" :prop="item.prop">
-        <el-input v-model="editCertificateForm[item.prop]"></el-input>
+        <el-input v-if="item.prop==='filenumber'" disabled v-model="editCertificateForm[item.prop]"></el-input>
+        <el-input v-else v-model="editCertificateForm[item.prop]"></el-input>
       </el-form-item>
-
 
     </el-form>
 
@@ -369,7 +289,6 @@
       <el-button type="primary" @click="editAllTypeData('certificate')">确 定</el-button>
     </span>
   </el-dialog>
-
 
   <!-- 添加标准对话框 -->
   <el-dialog v-model="addCriterionDialogVisible" :visible.sync="addCriterionDialogVisible" title="添加" width="30%">
@@ -396,13 +315,10 @@
     @close="editDialogClosed">
 
     <el-form :model="editCriterionForm" ref="editFormRef" label-width="100px" label-position="top">
-
       <el-form-item v-for="(item, index) in criterionFormItems" :key="index" :label="item.label" :prop="item.prop">
-        <el-input v-model="editCriterionForm[item.prop]"></el-input>
+        <el-input v-if="item.prop==='filenumber'" disabled v-model="editCriterionForm[item.prop]"></el-input>
+        <el-input v-else v-model="editCriterionForm[item.prop]"></el-input>
       </el-form-item>
-
-
-
     </el-form>
 
     <span slot="footer" class="dialog-footer">
@@ -411,30 +327,14 @@
     </span>
   </el-dialog>
 
-
   <!-- 添加文件对话框 -->
   <el-dialog v-model="addDocumentDialogVisible" :visible.sync="addDocumentDialogVisible" title="添加" width="30%">
     <!-- 内容主体区域 -->
     <el-form :model="addDocumentForm" ref="addFormRef" label-width="100px" label-position="top">
-
       <el-form-item v-for="(item, index) in documentFormItems" :key="index" :label="item.label" :prop="item.prop">
         <el-input v-model="addDocumentForm[item.prop]"></el-input>
       </el-form-item>
-
-    <!-- <el-form-item label="Site" prop="site">
-        <el-input v-model="addDocumentForm.site"></el-input>
-      </el-form-item>
-      <el-form-item label="文件編號" prop="certNum">
-        <el-input v-model="addDocumentForm.certNum"></el-input>
-      </el-form-item>
-      <el-form-item label="文件名稱" prop="DocumentName">
-        <el-input v-model="addDocumentForm.DocumentName"></el-input>
-      </el-form-item>
-      <el-form-item label="附件" prop="annex">
-        <el-input v-model="addDocumentForm.annex"></el-input>
-                      </el-form-item> -->
     </el-form>
-
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="addDocumentDialogVisible = false">取消</el-button>
@@ -449,9 +349,9 @@
   <el-dialog title="修改用户" v-model="editDocumentDialogVisible" :visible.sync="editDocumentDialogVisible" width="50%"
     @close="editDialogClosed">
     <el-form :model="editDocumentForm" ref="editFormRef" label-width="100px" label-position="top">
-
       <el-form-item v-for="(item, index) in documentFormItems" :key="index" :label="item.label" :prop="item.prop">
-        <el-input v-model="editDocumentForm[item.prop]"></el-input>
+        <el-input v-if="item.prop==='filenumber'" disabled v-model="editDocumentForm[item.prop]"></el-input>
+        <el-input v-else v-model="editDocumentForm[item.prop]"></el-input>
       </el-form-item>
     </el-form>
 
@@ -460,7 +360,9 @@
       <el-button type="primary" @click="editAllTypeData('document')">确 定</el-button>
     </span>
   </el-dialog>
+
 </template>
+
 
 <!-- <script setup lang="ts"> -->
 <script lang="ts" setup>
@@ -472,124 +374,51 @@ import axios from 'axios'
 import { getData, addData, updateData, deleteData, getSearchData, uploadData, addFile, deleteFile } from '../../api/dataCenter'
 import { objectPick } from '@vueuse/shared';
 
+
 // import {saveAs} from '../../../node_modules/file-saver';
 import { saveAs } from 'file-saver';
-
 // ==========
 import type { UploadProps, UploadUserFile } from 'element-plus'
 
 
-// const {
-//   appContext: {
-//     config: { globalProperties },
-//   },
-// } = getCurrentInstance()
+// 自定义证书，标准，文件类型
+interface Certificate {
 
-// console.log(globalProperties.$t('authority.signup'))
-
-
-
-
-
-
-
-// const certificateFileList = ref<UploadUserFile[]>([
-
-//   {
-//     name: '',
-//     url: 'https://element-plus.org/images/element-plus-logo.svg',
-//   },
-//   {
-//     name: '',
-//     url: 'https://element-plus.org/images/element-plus-logo.svg',
-//   },
-//   {
-//     name: '',
-//     url: 'https://element-plus.org/images/element-plus-logo.svg',
-//   },
-// ])
-
-// const criterionFileList = ref<UploadUserFile[]>([
-//   {
-//     name: '',
-//     url: 'https://element-plus.org/images/element-plus-logo.svg',
-//   },
-//   {
-//     name: '',
-//     url: 'https://element-plus.org/images/element-plus-logo.svg',
-//   },
-//   {
-//     name: '',
-//     url: 'https://element-plus.org/images/element-plus-logo.svg',
-//   },
-// ])
-
-// const documentFileList = ref<UploadUserFile[]>([
-//   {
-//     name: '',
-//     url: 'https://element-plus.org/images/element-plus-logo.svg',
-//   },
-//   {
-//     name: '',
-//     url: 'https://element-plus.org/images/element-plus-logo.svg',
-//   },
-//   {
-//     name: '',
-//     url: 'https://element-plus.org/images/element-plus-logo.svg',
-//   },
-// ])
-
-
-
-
-
-
-// 删除附件
-const handleRemove: UploadProps['onRemove'] = (file, uploadFiles) => {
-  console.log("uploadFiles", uploadFiles)
-  // 传给后端，要删除的文件。
-  console.log("file", file) //删除的文件
-  // deleteFile(file)
+site: string
+filenumber: string
+filename: string
+attachment: { name: string, url: string }[]
+issuedate: string
+expiringdate: string
+status: string
+username: string
 }
 
-// 浏览附件
-const handlePreview: UploadProps['onPreview'] = (uploadFile) => {
-  // console.log(uploadFile.url)
-  window.open(uploadFile.url)
-  // 点击文件查看
+interface Criterion {
+site: string
+filenumber: string
+filename: string
+ver: string,
+issuedate: string
+attachment: { name: string, url: string }[]
+status: string
+username: string
 }
 
-// 附件个数限制
-const handleExceed: UploadProps['onExceed'] = (files, uploadFiles) => {
-  ElMessage.warning(
-    `The limit is 3, you selected ${files.length} files this time, add up to ${files.length + uploadFiles.length
-    } totally`
-  )
+interface Document {
+
+site: string
+filenumber: string
+filename: string
+attachment: { name: string, url: string }[]
 }
 
 
-// //删除确认
-// const beforeRemove : UploadProps['beforeRemove'] = (uploadFile, uploadFiles) => {
-//   return ElMessageBox.confirm(
-//     `Cancel the transfer of file ?`
-//   ).then(
-//     () => {ElMessage.success('删除成功');return true},
-//     () => {ElMessage.error('删除失败');return false}
-//   )
-// }
+const certificate = 'certificate'
+const criterion = 'criterion'
+const document = 'document'
 
-
-
-// ==========
-// 附件地址
-const attachmentUploadAddress = () => {
-  return 'http://10.213.129.26:8000/api/DataCenter/'
-}
-// 批量上传地址
-const batchUploadDataAddress = () => {
-  return 'http://10.213.129.26:8000/api/DataCenter/'
-}
-
+const empno = '';
 
 // 文件当前页和每页的数量
 const currentDocumentPage = ref(3)
@@ -599,10 +428,25 @@ const pageDocumentSize = ref(2)
 const currentCriterionPage = ref(3)
 const pageCriterionSize = ref(2)
 
-// type Query = Record<string, any>;
-// type Form = Record<string, any>;
+// 标的总个数，用于控制分页
+const total2 = ref(0)
+const total3 = ref(0)
 
-// 证书，标准，文件信息
+// 用于存储表格的当前显示的列表的数据（当前页数据）
+const certificateList = ref<Certificate[]>([])
+const criterionList = ref<Criterion[]>([])
+const documentList = ref<Document[]>([])
+
+// 表格存放所有表的数据（所有数据）
+let tableData1: Certificate[] = []
+let tableData2: Criterion[] = []
+let tableData3: Document[] = []
+
+
+total2.value = tableData2.length
+total3.value = tableData3.length
+
+// 证书，标准，文件信息（查询，页码，每页个数）
 var queryCertificateInfo = ref<any>(
   {
     query: '',
@@ -624,50 +468,6 @@ var queryDocumentInfo = ref<any>(
     pagesize: 1
   }
 )
-
-// 自定义证书，标准，文件类型
-interface Certificate {
-
-  site: string
-  filenumber: string
-  filename: string
-  attachment: { name: string, url: string }[]
-  issuedate: string
-  expiringdate: string
-  status: string
-  username: string
-}
-
-interface Criterion {
-  site: string
-  filenumber: string
-  filename: string
-  ver: string,
-  issuedate: string
-  attachment: { name: string, url: string }[]
-  status: string
-  username: string
-}
-
-interface Document {
-
-  site: string
-  filenumber: string
-  filename: string
-  attachment: { name: string, url: string }[]
-}
-
-
-// var certificateList: Certificate[] = []
-
-// 用于存储表格的显示列表
-const certificateList = ref<Certificate[]>([])
-const criterionList = ref<Criterion[]>([])
-const documentList = ref<Document[]>([])
-
-
-
-
 
 // 添加证书的表单数据
 var addCertificateForm = ref<any>(
@@ -743,12 +543,10 @@ const addCertificateDialogVisible = ref(false);
 // 控制修改证书对话框的显示与隐藏
 var editCertificateDialogVisible = ref(false);
 
-
 // 控制添加标准对话框的显示与隐藏
 const addCriterionDialogVisible = ref(false);
 // 控制修改标准对话框的显示与隐藏
 var editCriterionDialogVisible = ref(false);
-
 
 // 控制添加文件对话框的显示与隐藏
 const addDocumentDialogVisible = ref(false);
@@ -759,22 +557,43 @@ var editDocumentDialogVisible = ref(false);
 const dialogVisible = ref(false)
 
 
-// console.log( 'tttttttttttttttttttttt',$t('authority.approve'))
 
-// 监听pagesize改变的事件，奇数行和偶数行的样式class
-const tableRowClassName = ({
-  rowIndex
-}: {
-  // row: User,
-  rowIndex: number
-}) => {
-  if (rowIndex % 2 === 1) {
-    return 'odd-row'
-  } else if (rowIndex % 2 === 0) {
-    return 'even-row'
-  }
-  return ''
-}
+// certificate表头
+const certificateForm = [
+  { label: 'Site', prop: 'site',width:'75px'},
+  { label: '證書編號', prop: 'filenumber',width:'150px' },
+  { label: '證書標準', prop: 'filename',width:'200px' },
+  { label: '證書附件',prop:'attachment',width:'100px'},
+  { label: '登證日期', prop: 'issuedate',width:'150px' },
+  { label: '失效日期', prop: 'expiringdate' ,width:'150px'},
+  { label: '狀態', prop: 'status' ,width:'75px'},
+  { label: '上傳人', prop: 'username',width:'100px'},
+  { label: '編輯', prop: 'edit',width:'75px'},
+  { label: '刪除', prop: 'delete',width:'75px'},
+]
+// criterion表头
+const criterionForm = [
+  { label: 'Site', prop: 'site',width:'75px'},
+  { label: '文件編號', prop: 'filenumber',width:'150px' },
+  { label: '文件名稱', prop: 'filename',width:'200px' },
+  { label: '版本', prop: 'ver' ,width:'150px'},
+  { label: '登證日期', prop: 'issuedate',width:'150px' },
+  {label:'附件',prop:'attachment',width:'100px'},
+  { label: '狀態', prop: 'status' ,width:'75px'},
+  { label: '上傳人', prop: 'username',width:'100px'},
+  { label: '編輯', prop: 'edit',width:'75px'},
+  { label: '刪除', prop: 'delete',width:'75px'},
+]
+// document表头
+const documentForm = [
+  { label: 'Site', prop: 'site',width:'200'},
+  { label: '文件編號', prop: 'filenumber',width:'225' },
+  { label: '文件名稱', prop: 'filename',width:'225' },
+  {label:'附件',prop:'attachment',width:'200'},
+  { label: '編輯', prop: 'edit',width:'75'},
+  { label: '刪除', prop: 'delete',width:'75'},
+]
+
 
 // 证书表单项
 const certificateFormItems = [
@@ -805,19 +624,24 @@ const documentFormItems = [
   { label: '文件名稱', prop: 'filename' },
 ]
 
-let tableData1: Certificate[] = []
-let tableData2: Criterion[] = []
-let tableData3: Document[] = []
 
-const total2 = ref(0)
-const total3 = ref(0)
-
-total2.value = tableData2.length
-total3.value = tableData3.length
-
-
-
+// 初始页面数据
 getAllData()
+
+// 奇数行和偶数行的样式class
+const tableRowClassName = ({
+  rowIndex
+}: {
+  // row: User,
+  rowIndex: number
+}) => {
+  if (rowIndex % 2 === 1) {
+    return 'odd-row'
+  } else if (rowIndex % 2 === 0) {
+    return 'even-row'
+  }
+  return ''
+}
 
 // 监听pagesize改变的事件
 function handleCriterionSizeChange(newSize: number) {
@@ -852,11 +676,6 @@ function getAllData() {
     total2.value = tableData2.length
     total3.value = tableData3.length
 
-
-    // certificateList.value = tableData1
-    // criterionList.value = tableData2
-    // documentList.value = tableData3
-
     getCertificateList()
     getCriterionList()
     getDocumentList()
@@ -881,10 +700,8 @@ function searchData(table: string) {
   // 连接后端
   getSearchData(table, queryText).then((res: any) => {
 
-    console.log("res.data",res.data)
-    let data: any[] = res.data
 
-    console.log("data", data)
+    let data: any[] = res.data
 
     if (table === 'certificate') {
       certificateList.value = data
@@ -899,12 +716,8 @@ function searchData(table: string) {
 }
 
 
-
-
-
 // 获取证书表
 function getCertificateList() {
-
 
   let data: Certificate[] = []
   for (let index = (queryCertificateInfo.value.pagenum - 1) * queryCertificateInfo.value.pagesize; index < queryCertificateInfo.value.pagesize * queryCertificateInfo.value.pagenum; index++) {
@@ -912,19 +725,9 @@ function getCertificateList() {
     tableData1[index].attachment = [
       {
         name: '',
-        url: 'https://element-plus.org/images/element-plus-logo.svg',
-      },
-      {
-        name: '',
-        url: 'https://element-plus.org/images/element-plus-logo.svg',
-      },
-      {
-        name: '',
-        url: 'https://element-plus.org/images/element-plus-logo.svg',
+        url: 'http://10.124.131.25//uploadFile/2022-12-12/20221212170825894.xls',
       },
     ]
-
-
 
     data[index] = tableData1[index];
     // certificateList.push(tableData1[index])
@@ -944,18 +747,7 @@ function getCriterionList() {
         name: '1',
         url: 'https://element-plus.org/images/element-plus-logo.svg',
       },
-      {
-        name: '2',
-        url: 'https://element-plus.org/images/element-plus-logo.svg',
-      },
-      {
-        name: '3',
-        url: 'https://element-plus.org/images/element-plus-logo.svg',
-      },
     ]
-
-
-
 
     data[index] = tableData2[index];
     // criterionList.push(tableData2[index]);
@@ -975,45 +767,20 @@ function getDocumentList() {
         name: '',
         url: 'https://element-plus.org/images/element-plus-logo.svg',
       },
-      {
-        name: '',
-        url: 'https://element-plus.org/images/element-plus-logo.svg',
-      },
-      {
-        name: '',
-        url: 'https://element-plus.org/images/element-plus-logo.svg',
-      },
     ]
-
-
-
-
     data[index] = tableData3[index];
     // documentList.push(tableData3[index]);
   }
   documentList.value = data
 }
 
-
 // 根据表类型，添加对应数据
 function addAllTypeData(table: string) {
-  // this.$refs.addFormRef.validate(async valid => {
-  //     if (!valid) return
-  //     // 可以发起添加用户的网络请求
-  //     const { data: res } = await this.$http.post('users', this.addForm)
 
-
-  // if (res.meta.status !== 201) {
-  //     this.$message.error('添加用户失败！')
-  // }
-  // this.$message.success('添加用户成功！')
-  // this.addDialogVisible = false
-  // this.getUserList()
-  // })
   let addFormData: any = ''
 
   if (table === 'certificate') {
-    console.log(addCertificateForm.value)
+
     addFormData = addCertificateForm.value
   } else if (table === 'criterion') {
     addFormData = addCriterionForm.value
@@ -1091,6 +858,7 @@ function showAllTypeEditDialog(table: string, row: any) {
     editCriterionDialogVisible.value = true
   } else if (table === 'document') {
     // Object.assign(editDocumentForm.value, row)
+    editDocumentForm.value = row
     editDocumentDialogVisible.value = true
   } else {
     console.log("错误")
@@ -1108,204 +876,7 @@ function removeAllTypeById(table: string, fileName: string) {
     () => { ElMessage.error('删除失败') }
   )
 
-  // ElMessageBox.confirm('Are you sure to delete this data?')
-  //   .then(() => {
-  //     deleteData(table, fileName)
-  //     ElMessage.success('删除成功')
-  //   })
-  //   .catch(() => {
-  //     ElMessage.error('删除失败')
-  //   })
-
-
-
-  //  // 弹框询问
-  //  const confirmResult = await this.$confirm(
-  //                 '此操作将永久删除该用户, 是否继续?',
-  //                 '提示', {
-  //                 confirmButtonText: '确定',
-  //                 cancelButtonText: '取消',
-  //                 type: 'warning'
-  //             }).catch(err => err)
-
-  //             if (confirmResult !== 'confirm') {
-  //                 return this.$message.info('已取消删除')
-  //             }
-
-  //             const { data: res } = await this.$http.delete('users/' + id)
-  //             if (res.meta.status !== 200) {
-  //                 return this.$message.error('删除用户失败！')
-  //             }
-
-  //             this.$message.success('删除用户成功！')
-  //             this.getUserList()
-
 }
-
-// 1.这是几个表
-// 2.查询时，是按照你给的字段查询吗（我的搜索是只有一个搜索，他搜索是按照一种方式搜索）
-// 3.批量上传，是直接将文件传给你吗
-// 4.编辑我上传的是全部字段
-// 5.新增我上传的也是全部字段
-// 6.附件上传我上传的是地址
-// 6.删除附件，我只提供了删除的类型，已经文件名，附件名。
-// 7.数据的删除，我只提供了删除的类型，和文件名。
-
-
-// // 标准增删改查
-// function addCriterion() {
-//   // this.$refs.addFormRef.validate(async valid => {
-//   //     if (!valid) return
-//   //     // 可以发起添加用户的网络请求
-//   //     const { data: res } = await this.$http.post('users', this.addForm)
-
-
-//   //     if (res.meta.status !== 201) {
-//   //         this.$message.error('添加用户失败！')
-//   //     }
-//   //     this.$message.success('添加用户成功！')
-//   //     this.addDialogVisible = false
-//   //     this.getUserList()
-//   // })
-
-
-//     addCriterionForm.value.no = tableData2.length.toString();
-
-//     // tableData2 = tableData2.concat(addCriterionForm.value)
-//     tableData2.push(addCriterionForm.value)
-//     // Vue.set(tableData2,tableData2.length,addCriterionForm.value)
-
-//     total2.value = tableData2.length
-
-//     addCriterionDialogVisible.value = false
-//     getCriterionList()
-
-// }
-
-// function editCriterionInfo() {
-
-//   const id = parseInt(editCriterionForm.value.no)
-//   Object.assign(tableData2[id - 1], editCriterionForm.value)
-
-//   editCriterionDialogVisible.value = false
-//   getCriterionList()
-
-// }
-
-// function showCriterionEditDialog(id: number) {
-
-
-//   Object.assign(editCriterionForm.value, tableData2[id - 1])
-//   editCriterionDialogVisible.value = true
-// }
-
-// function removeStardardById(id: number) {
-
-//  console.log(id)
-//  ElMessage.success('删除成功');
-
-
-// //  // 弹框询问
-// //  const confirmResult = await this.$confirm(
-// //                 '此操作将永久删除该用户, 是否继续?',
-// //                 '提示', {
-// //                 confirmButtonText: '确定',
-// //                 cancelButtonText: '取消',
-// //                 type: 'warning'
-// //             }).catch(err => err)
-
-// //             if (confirmResult !== 'confirm') {
-// //                 return this.$message.info('已取消删除')
-// //             }
-
-// //             const { data: res } = await this.$http.delete('users/' + id)
-// //             if (res.meta.status !== 200) {
-// //                 return this.$message.error('删除用户失败！')
-// //             }
-
-// //             this.$message.success('删除用户成功！')
-// //             this.getUserList()
-
-// }
-
-
-// // 文件增删改查
-// function addDocument() {
-//   // this.$refs.addFormRef.validate(async valid => {
-//   //     if (!valid) return
-//   //     // 可以发起添加用户的网络请求
-//   //     const { data: res } = await this.$http.post('users', this.addForm)
-
-
-//   //     if (res.meta.status !== 201) {
-//   //         this.$message.error('添加用户失败！')
-//   //     }
-//   //     this.$message.success('添加用户成功！')
-//   //     this.addDialogVisible = false
-//   //     this.getUserList()
-//   // })
-
-
-//     addDocumentForm.value.no = tableData3.length.toString();
-//     tableData3.push(addDocumentForm.value)
-//     total3.value = tableData3.length
-
-//     addDocumentDialogVisible.value = false
-//     getDocumentList()
-
-// }
-
-// function editDocumentInfo() {
-
-//   const id = parseInt(editDocumentForm.value.no)
-//   Object.assign(tableData3[id - 1], editDocumentForm.value)
-
-//   editDocumentDialogVisible.value = false
-//   getDocumentList()
-
-// }
-
-// function showDocumentEditDialog(row: any) {
-
-// Object.assign(editDocumentForm.value, row)
-// editDocumentDialogVisible.value = true
-// }
-
-// function removeDocumentById(row : any) {
-
-//  console.log(id)
-//  ElMessage.success('删除成功');
-
-
-// //  // 弹框询问
-// //  const confirmResult = await this.$confirm(
-// //                 '此操作将永久删除该用户, 是否继续?',
-// //                 '提示', {
-// //                 confirmButtonText: '确定',
-// //                 cancelButtonText: '取消',
-// //                 type: 'warning'
-// //             }).catch(err => err)
-
-// //             if (confirmResult !== 'confirm') {
-// //                 return this.$message.info('已取消删除')
-// //             }
-
-// //             const { data: res } = await this.$http.delete('users/' + id)
-// //             if (res.meta.status !== 200) {
-// //                 return this.$message.error('删除用户失败！')
-// //             }
-
-// //             this.$message.success('删除用户成功！')
-// //             this.getUserList()
-
-// }
-
-
-
-// 下载
-// const tableRef1 = ref<HTMLElement | null>(null);
-// const tableRef2 = ref<HTMLElement | null>(null);
-// const tableRef3 = ref<HTMLElement | null>(null);
 
 // 下载表格数据
 const downloadExcel = (table: string) => {
@@ -1335,32 +906,81 @@ const downloadExcel = (table: string) => {
   saveAs(blob, documentName)
 };
 
+// 批量上传
+const batchBeforeUploade = (type:string) => (uploadFile:any) => {
+    batchUpload(type,uploadFile)
+    getAllData()
+}
+
+// 批量表格数据上传
+function batchUpload(table:string,uploadFile:any) {
+    let formDa = new FormData()
+    formDa.append('file',uploadFile)
+    uploadData(table,formDa).then((res:any)=>{
+      console.log("res.data",res.data)
+    }).catch((error:any)=>{
+      console.log(error)
+    })
+    
+} 
+
+
+// 附件增加
+const certificateBeforeUpload = (row:any) => (file:any) => {
+     addAttach('certificate',row,file)
+    // return false
+}
+
+const criterionBeforeUpload = (row:any) => (file:any) => {
+   addAttach('criterion',row,file)
+    // return false
+}
+
+const documentBeforeUpload = (row:any) => (file:any) => {
+   addAttach('document',row,file)
+    // return false
+}
+
+// 增加附件调用后端接口
+function addAttach(table:string,row:any,file:any){
+  let formDa = new FormData()
+    formDa.append('file',file)
+     addFile(table,row.filenumber,formDa).then((res:any)=>{
+      console.log("res.data",res.data)
+    }).catch((error:any)=>{
+      console.log(error)
+    })
+    getAllData()
+}
+
+const attachmentBeforeRemove = (row:any, type:any) => (attachment:any,attachmentList:any) => {
+   deleteFile(type,row.filenumber, attachment.name).then((res:any)=>{
+      console.log("res.data",res.data)
+    }).catch((error:any)=>{
+      console.log(error)
+    })
+    getAllData()
+}
+
+// 删除附件
+const handleRemove: UploadProps['onRemove'] = (file, uploadFiles) => {
+  console.log("uploadFiles", uploadFiles)
+}
+
+// 浏览附件
+const handlePreview: UploadProps['onPreview'] = (uploadFile) => {
+  // console.log(uploadFile.url)
+  window.open(uploadFile.url)
+  // 点击文件查看
+}
+
 
 
 
 </script>
 
 
-
-
 <style  lang="scss" scoped>
-// .upload-list {
-//   display: flex;
-//   flex-wrap: wrap;
-//   justify-content: flex-start;
-//   width: 100px;
-//   /* 自定义宽度 */
-// }
-
-// .upload-item {
-//   width: 20px;
-//   /* 自定义宽度 */
-//   height: 20px;
-//   /* 自定义高度 */
-//   margin-right: 10px;
-//   margin-bottom: 10px;
-//   position: relative;
-// }
 
 .upload-img {
   width: 100%;
