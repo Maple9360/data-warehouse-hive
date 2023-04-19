@@ -1,17 +1,15 @@
-<el-table :data="tableData" :row-key="row => row.id">
-  <el-table-column label="操作">
-    <template #default="scope">
-      <el-upload
-        class="upload-demo"
-        :before-upload="handleBeforeUpload(scope.row)"
-        :on-success="handleUploadSuccess"
-        :on-error="handleUploadError"
-        :action="uploadUrl"
-        :show-file-list="false"
-        :auto-upload="false"
-      >
-        <el-button size="small" type="primary">上传</el-button>
-      </el-upload>
-    </template>
-  </el-table-column>
-</el-table>
+      <el-table ref="table1" :row-style="{ height: 30 }" height="100" :data="certificateList"
+        :row-class-name="tableRowClassName" :header-cell-style="{ textAlign: 'center' }"
+        :cell-style="{ textAlign: 'center' }">
+        <el-table-column label="No." type="index" width="50px"></el-table-column>
+
+        <el-form-item v-for="(item, index) in certificateForm" :key="index" :label="item.label" :prop="item.prop" :width="item.width">
+          <template v-if="item.prop ==='attachment' " slot-scope="scope">
+            <el-upload :before-remove="attachmentBeforeRemove(scope.row,certificate)" :before-upload="certificateBeforeUpload(scope.row)" v-model:file-list="scope.row.attachment" class="upload-demo" action="#"
+              multiple  :on-preview="handlePreview" :on-remove="handleRemove" :limit="3"  >
+              <el-button>
+                <img src="./icons/文件.png" class="export_icon" style="width:12px;height: 12px;" />
+              </el-button>
+            </el-upload>
+          </template>
+        </el-form-item>
