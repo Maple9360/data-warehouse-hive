@@ -1,39 +1,40 @@
 <template>
-  <div>
-    <el-select v-model="selectedFields" multiple filterable>
-      <el-option v-for="field in fields" :key="field" :label="field" :value="field" :disabled="selectedFields.indexOf(field) < 0">
-      </el-option>
-    </el-select>
-  </div>
+  <el-select v-model="selectedOption" placeholder="请选择">
+    <el-option v-for="option in options" :key="option.value" :label="option.label" :value="option.value"></el-option>
+  </el-select>
+
+  <el-table v-if="selectedOption === 'table1'" :data="table1Data">
+    <!-- 表格列定义 -->
+  </el-table>
+
+  <el-table v-if="selectedOption === 'table2'" :data="table2Data">
+    <!-- 表格列定义 -->
+  </el-table>
 </template>
 
-<script lang="ts" setup>
-import { ref, onMounted } from 'vue';
-import { ElSelect, ElOption } from 'element-plus';
+<script setup lang="ts">
+import { ref } from 'vue';
+import { getTable1Data, getTable2Data } from '@/api';
 
-const fields = ref<string[]>([]);
-const selectedFields = ref<string[]>([]);
+interface Option {
+  label: string;
+  value: string;
+}
 
-onMounted(() => {
-  // 请求后端获取所有表的字段和数据，并更新fields数组
-  fetch('/api/fields')
-    .then(response => response.json())
-    .then(data => {
-      fields.value = data.fields;
-    })
-    .catch(error => {
-      console.error(error);
-    });
-});
+const options: Option[] = [
+  { label: '表格1', value: 'table1' },
+  { label: '表格2', value: 'table2' },
+];
 
-// 导出组件
-export default {
-  components: { ElSelect, ElOption },
-  setup() {
-    return {
-      fields,
-      selectedFields,
-    };
-  },
-};
+const selectedOption = ref<string>(''); // 当前选中的选项
+const table1Data = ref<any[]>([]);
+const table2Data = ref<any[]>([]);
+
+// 初始化数据
+async function init() {
+  table1Data.value = await getTable1Data();
+  table2Data.value = await getTable2Data();
+}
+
+init();
 </script>
