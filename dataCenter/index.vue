@@ -155,7 +155,8 @@
       <div class="page_row">
         <el-pagination  small @size-change="handleCriterionSizeChange" @current-change="handleCriterionCurrentChange"
           v-model:current-page="currentCriterionPage" :page-sizes="[1, 2, 5]" v-model:page-size="pageCriterionSize"
-          layout=" ->,total, prev, pager, next,sizes, jumper" :total="total2" popper-class="pageSelect"></el-pagination>
+          layout=" ->,total, prev, pager, next,sizes, jumper" :total="total2" popper-class="pageSelect">
+        </el-pagination>
       </div>
 
     </div>
@@ -203,7 +204,7 @@
             style="height: 25px;  color: white; background: transparent; border: none;">
             <el-icon>
               <Plus />
-            </el-icon>{{ $t('dataCenter.new') }}</el-button>
+            </el-icon></el-button>
         </el-col>
 
       </el-row>
@@ -264,9 +265,9 @@
 
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="addCertificateDialogVisible = false">取消</el-button>
+        <el-button @click="addCertificateDialogVisible = false">{{ $t('dataCenter.cancel') }}</el-button>
         <el-button type="primary" @click="addAllTypeData('certificate')">
-          確認
+          {{ $t('dataCenter. confirm') }}
         </el-button>
       </span>
     </template>
@@ -284,8 +285,8 @@
     </el-form>
 
     <span slot="footer" class="dialog-footer">version
-      <el-button @click="editCertificateDialogVisible = false">取 消</el-button>
-      <el-button type="primary" @click="editAllTypeData('certificate')">确 定</el-button>
+      <el-button @click="editCertificateDialogVisible = false">{{ $t('dataCenter.cancel') }}</el-button>
+      <el-button type="primary" @click="editAllTypeData('certificate')">{{ $t('dataCenter.confirm') }}</el-button>
     </span>
   </el-dialog>
 
@@ -301,17 +302,16 @@
 
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="addCriterionDialogVisible = false">取消</el-button>
+        <el-button @click="addCriterionDialogVisible = false">{{ $t('dataCenter.cancel') }}</el-button>
         <el-button type="primary" @click="addAllTypeData('criterion')">
-          確認
+          {{ $t('dataCenter.confirm') }}
         </el-button>
       </span>
     </template>
   </el-dialog>
 
   <!--编辑标准对话框-->>
-  <el-dialog title="修改用户" v-model="editCriterionDialogVisible" :visible.sync="editCriterionDialogVisible" width="50%"
-    @close="editDialogClosed">
+  <el-dialog title="修改用户" v-model="editCriterionDialogVisible" :visible.sync="editCriterionDialogVisible" width="50%">
 
     <el-form :model="editCriterionForm" ref="editFormRef" label-width="100px" label-position="top">
       <el-form-item v-for="(item, index) in criterionFormItems" :key="index" :label="item.label" :prop="item.prop">
@@ -336,17 +336,16 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="addDocumentDialogVisible = false">取消</el-button>
+        <el-button @click="addDocumentDialogVisible = false">{{ $t('dataCenter.cancel') }}</el-button>
         <el-button type="primary" @click="addAllTypeData('document')">
-          確認
+          {{ $t('dataCenter.confirm') }}
         </el-button>
       </span>
     </template>
   </el-dialog>
 
   <!--编辑文件对话框-->>
-  <el-dialog title="修改用户" v-model="editDocumentDialogVisible" :visible.sync="editDocumentDialogVisible" width="50%"
-    @close="editDialogClosed">
+  <el-dialog title="修改用户" v-model="editDocumentDialogVisible" :visible.sync="editDocumentDialogVisible" width="50%">
     <el-form :model="editDocumentForm" ref="editFormRef" label-width="100px" label-position="top">
       <el-form-item v-for="(item, index) in documentFormItems" :key="index" :label="item.label" :prop="item.prop">
         <el-input v-if="item.prop==='filenumber'" disabled v-model="editDocumentForm[item.prop]"></el-input>
@@ -368,12 +367,12 @@
 import { ref, reactive, onMounted,getCurrentInstance } from 'vue'
 import { Plus, Search, Filter, UploadFilled, Download, Edit, Delete, SetUp, Document } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, ElUpload } from 'element-plus';
-import * as XLSX from '../../../node_modules/xlsx';
+import * as XLSX from 'xlsx';
 import axios from 'axios'
-import { getData, addData, updateData, deleteData, getSearchData, uploadData, addFile, deleteFile } from '../../api/dataCenter'
+import { getData, addData, updateData, deleteData, getSearchData, uploadData, addFile, deleteFile } from '@/api/dataCenter'
 import { objectPick } from '@vueuse/shared';
 
-
+import { useUserStore } from '@/store/modules/user.ts'
 // import {saveAs} from '../../../node_modules/file-saver';
 import { saveAs } from 'file-saver';
 // ==========
@@ -429,7 +428,16 @@ const certificate = 'certificate'
 const criterion = 'criterion'
 const document = 'document'
 
-const empno = '';
+
+// id:'user',
+// state: (): userType => ({
+// username: 'string',
+// empno: 'string', // employee number
+// role: 'string',
+// module: [], //
+// 获取登陆信息
+const empno = ref(useUserStore.empno)
+console.log("useUserStore.empno",useUserStore);
 
 // 文件当前页和每页的数量
 const currentDocumentPage = ref(1)
@@ -754,7 +762,7 @@ function addAllTypeData(table: string) {
   }
 
 
-  addData(table, addFormData).then((res: any) => {
+  addData(table, addFormData,empno.value).then((res: any) => {
     
     if (res.status !== 200) {
       ElMessage.error('添加用户失败！')
@@ -791,7 +799,7 @@ function editAllTypeData(table: string) {
   }
 
 
-  updateData(table, editFormData).then((res: any) => {
+  updateData(table, editFormData,empno.value).then((res: any) => {
 
     if (res.status !== 200) {
       ElMessage.error('编辑用户失败！')
@@ -839,7 +847,7 @@ function removeAllTypeById(table: string, fileName: string) {
   ElMessageBox.confirm(
     `Are you sure to delete this data?`
   ).then(
-    () => { deleteData(table, fileName), ElMessage.success('删除成功') },
+    () => { deleteData(table, fileName,empno.value), ElMessage.success('删除成功') },
     () => { ElMessage.error('删除失败') }
   )
 
@@ -886,7 +894,7 @@ const batchBeforeUploade = (type:string) => (uploadFile:any) => {
 function batchUpload(table:string,uploadFile:any) {
     let formDa = new FormData()
     formDa.append('file',uploadFile)
-    uploadData(table,formDa).then((res:any)=>{
+    uploadData(table,formDa,empno.value).then((res:any)=>{
       console.log("uploadData.res.data",res.data)
     }).catch((error:any)=>{
       console.log(error)
@@ -913,7 +921,7 @@ const documentBeforeUpload = (row:any) => (file:any) => {
 function addAttach(table:string,row:any,file:any){
   let formDa = new FormData()
     formDa.append('file',file)
-     addFile(table,row.filenumber,formDa).then((res:any)=>{
+     addFile(table,row.filenumber,formDa,empno).then((res:any)=>{
       console.log("addFile.res.data",res.data)
     }).catch((error:any)=>{
       console.log(error)
@@ -924,7 +932,7 @@ function addAttach(table:string,row:any,file:any){
 
 // 删除附件
 const attachmentBeforeRemove = (row:any, type:any) => (attachment:any,attachmentList:any) => {
-   deleteFile(type,row.filenumber, attachment.name).then((res:any)=>{
+   deleteFile(type,row.filenumber, attachment.name,empno.value).then((res:any)=>{
       console.log("deleteFile.res.data",res.data)
     }).catch((error:any)=>{
       console.log(error)
