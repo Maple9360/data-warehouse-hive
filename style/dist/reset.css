@@ -1,0 +1,11 @@
+html,
+body,
+#app {
+  font-size: 14px;
+  width: 100vw;
+  height: 100vh !important;
+  display: flex;
+  background: #000;
+  margin: 0px !important;
+  padding: 0px !important;
+}

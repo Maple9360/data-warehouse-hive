@@ -1,0 +1,12 @@
+@import './variables';
+
+:export {
+  fontColor: $font-color;
+  titleColor: $titleColor;
+  titleSize: $titleSize;
+  axisColor: $axisColor;
+  axisSize: $axisSize;
+  buttonColor: $buttonColor;
+  test: $test;
+  splitLine: $splitLine;
+}

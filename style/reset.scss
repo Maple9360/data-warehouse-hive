@@ -1,0 +1,32 @@
+
+body {
+  height: 100%;
+  width: 100%;
+  background: red;
+  padding: 0px;
+  margin: 0px !important;
+  // -webkit-font-smoothing: antialiased;
+  // text-rendering: optimizeLegibility;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+}
+html,body,#app{
+  height: 100% ;
+  width: 100%;
+  background: #000; // 浏览器的底色
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  margin: 0px !important;
+  // border: 1px solid yellow;
+}
+a {
+  text-decoration: none
+}
+// #app{
+//   height: 100%;
+//   width: 100%;
+//   margin: 0px;
+//   padding: 0px;
+// }
